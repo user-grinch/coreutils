@@ -1,6 +1,6 @@
 #include "nav.h"
-#include "fonts/fontmgr.h"
-#include "fonts/fonts.h"
+#include "imgui/fonts/fontmgr.h"
+#include "imgui/fonts/fonts.h"
 #include <map>
 #include <algorithm>
 #include <iomanip>
