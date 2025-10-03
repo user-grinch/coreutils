@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include <CMenuManager.h>
-#include <imgui_impl_win32.h>
+#include <backends/imgui_impl_win32.h>
 
 #include "imgui_impl_rw.h"
 #include "renderhook.h"
@@ -90,7 +90,7 @@ void RenderHook::InitImGui()
     ImGuiIO &io = ImGui::GetIO();
     io.IniFilename = NULL;
     io.LogFilename = NULL;
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 20.0f);
+    //io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 20.0f);
     ogWndProc = reinterpret_cast<WNDPROC>(
         SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(WndProcHook)));
     plugin::patch::Nop(0x00531155, 5); // shift trigger fix

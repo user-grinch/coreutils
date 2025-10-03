@@ -15,7 +15,7 @@ bool ImGuiNav::BeginPage(const char* icon, const char* name, bool active)
     ImGuiStyle& style = g.Style;
     ImGuiID id = window->GetID(icon);
     ImFont *iconFont = FontMgr::Get("icon");
-    ImVec2 iconSz = iconFont->CalcTextSizeA(iconFont->FontSize, FLT_MAX, 0.0f, icon);
+    ImVec2 iconSz = iconFont->CalcTextSizeA(iconFont->LegacySize, FLT_MAX, 0.0f, icon);
     ImVec2 windowPos = window->Pos;
     ImVec2 pos = window->DC.CursorPos;
 
@@ -31,13 +31,14 @@ bool ImGuiNav::BeginPage(const char* icon, const char* name, bool active)
     ImVec4 iconCol = style.Colors[active? ImGuiCol_TitleBgActive : hovered ? ImGuiCol_TextDisabled : ImGuiCol_Text];
     iconCol.w = 0.7f;
 
-    window->DrawList->AddText(iconFont, iconFont->FontSize, (rect.Min + rect.Max - iconSz) / 2, (ImColor)iconCol, icon);
+    window->DrawList->AddText(iconFont, iconFont->LegacySize, (rect.Min + rect.Max - iconSz) / 2, (ImColor)iconCol,
+                              icon);
 
     if (hovered) {
         auto drawlist = ImGui::GetForegroundDrawList();
 
         ImFont *textFont = FontMgr::Get("title");
-        float titleSz = textFont->FontSize / 1.2f;
+        float titleSz = textFont->LegacySize / 1.2f;
         ImVec2 sz = textFont->CalcTextSizeA(titleSz, FLT_MAX, 0.0f, name);
         
         ImVec2 min = {rect.Max.x + style.ItemSpacing.x * 4.0f, 
@@ -85,9 +86,9 @@ bool ImGuiNav::BeginTab(const char* name, bool active)
     const ImGuiStyle& style = g.Style;
     const ImGuiID id = window->GetID(name);
     ImFont *pTitle = FontMgr::Get("title");
-    float titleSz = pTitle->FontSize / 1.2f;
+    float titleSz = pTitle->LegacySize / 1.2f;
     ImFont *pIcon = FontMgr::Get("icon");
-    ImVec2 iconSz = pIcon->CalcTextSizeA(pIcon->FontSize, FLT_MAX, 0.0f, ICON_HOME);
+    ImVec2 iconSz = pIcon->CalcTextSizeA(pIcon->LegacySize, FLT_MAX, 0.0f, ICON_HOME);
     ImVec2 textSz = pTitle->CalcTextSizeA(titleSz, FLT_MAX, 0.0f, "Custom Skins");
     ImVec2 pos = window->DC.CursorPos;
 
