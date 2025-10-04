@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <d3d9.h> // Needed for scissor states
 #include <imgui.h>
 #include <plugin.h>
 #include <rpworld.h>
@@ -9,6 +10,8 @@ using namespace plugin;
 static RwTexture *g_FontTexture = nullptr;
 static RwIm2DVertex *g_vertbuf = nullptr;
 static int g_vertbufSize = 0;
+
+//   IDirect3DDevice9* device = *(IDirect3DDevice9**)0xC97C28;  // for GTA:SA
 
 void ImGui_ImplRW_RenderDrawData(ImDrawData *draw_data)
 {
@@ -46,7 +49,6 @@ void ImGui_ImplRW_RenderDrawData(ImDrawData *draw_data)
             RwIm2DVertexSetCameraZ(&vtx_dst[i], RwCameraGetNearClipPlane(cam));
             RwIm2DVertexSetRecipCameraZ(&vtx_dst[i], recipZ);
 
-            // Premultiplied alpha fix
             unsigned int col = vtx_src[i].col;
             float alpha = ((col >> 24) & 0xFF) / 255.0f;
             RwIm2DVertexSetIntRGBA(&vtx_dst[i], (int)((col & 0xFF) * alpha), (int)(((col >> 8) & 0xFF) * alpha),
@@ -58,7 +60,7 @@ void ImGui_ImplRW_RenderDrawData(ImDrawData *draw_data)
         vtx_dst += cmd_list->VtxBuffer.Size;
     }
 
-    // Save render states
+    // Save RW render states
     void *tex;
     int vertexAlpha, srcBlend, dstBlend, ztest, addrU, addrV, filter, cullmode, shadeMode;
     RwRenderStateGet(rwRENDERSTATEVERTEXALPHAENABLE, &vertexAlpha);
@@ -80,6 +82,13 @@ void ImGui_ImplRW_RenderDrawData(ImDrawData *draw_data)
     RwRenderStateSet(rwRENDERSTATECULLMODE, (void *)rwCULLMODECULLNONE);
     RwRenderStateSet(rwRENDERSTATESHADEMODE, (void *)rwSHADEMODEGOURAUD);
 
+    // Get D3D device for scissor
+    IDirect3DDevice9 *d3ddev = (IDirect3DDevice9 *)GetD3DDevice();
+    RECT oldScissor;
+    d3ddev->GetScissorRect(&oldScissor);
+    BOOL oldScissorEnable;
+    d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, (DWORD*) & oldScissorEnable);
+
     int vtx_offset = 0;
     for (int n = 0; n < draw_data->CmdListsCount; n++)
     {
@@ -94,11 +103,21 @@ void ImGui_ImplRW_RenderDrawData(ImDrawData *draw_data)
             }
             else
             {
+                // Setup scissor rect
+                RECT r;
+                r.left = (LONG)pcmd->ClipRect.x;
+                r.top = (LONG)pcmd->ClipRect.y;
+                r.right = (LONG)pcmd->ClipRect.z;
+                r.bottom = (LONG)pcmd->ClipRect.w;
+                d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+                d3ddev->SetScissorRect(&r);
+
+                // Set texture
                 RwTexture *tex2 = (RwTexture *)pcmd->GetTexID();
                 if (tex2 && tex2->raster)
-                {
                     RwRenderStateSet(rwRENDERSTATETEXTURERASTER, tex2->raster);
-                }
+
+                // Render
                 RwIm2DRenderIndexedPrimitive(rwPRIMTYPETRILIST, g_vertbuf + vtx_offset, cmd_list->VtxBuffer.Size,
                                              cmd_list->IdxBuffer.Data + idx_offset, pcmd->ElemCount);
             }
@@ -107,7 +126,11 @@ void ImGui_ImplRW_RenderDrawData(ImDrawData *draw_data)
         vtx_offset += cmd_list->VtxBuffer.Size;
     }
 
-    // Restore render states
+    // Restore scissor state
+    d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, oldScissorEnable);
+    d3ddev->SetScissorRect(&oldScissor);
+
+    // Restore RW render states
     RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, (void *)vertexAlpha);
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void *)srcBlend);
     RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void *)dstBlend);

@@ -37,24 +37,6 @@ class ImGuiExtras
     static bool ListBox(const char *label, VecStr &allItems, int &selected);
     static bool ListBox(const char *label, VecStr &allItems, std::string &selected);
 
-    // Sliders
-    static bool SliderInt(const char *label, int *v, int v_min, int v_max, const char *format = NULL,
-                          ImGuiSliderFlags flags = ImGuiSliderFlags_None);
-    static bool SliderInt2(const char *label, int v[2], int v_min, int v_max, const char *format = "%d",
-                           ImGuiSliderFlags flags = ImGuiSliderFlags_None);
-    static bool SliderInt3(const char *label, int v[3], int v_min, int v_max, const char *format = "%d",
-                           ImGuiSliderFlags flags = ImGuiSliderFlags_None);
-    static bool SliderInt4(const char *label, int v[4], int v_min, int v_max, const char *format = "%d",
-                           ImGuiSliderFlags flags = ImGuiSliderFlags_None);
-    static bool SliderFloat(const char *label, float *v, float v_min, float v_max, const char *format = "%.3f",
-                            ImGuiSliderFlags flags = ImGuiSliderFlags_None);
-    static bool SliderFloat2(const char *label, float v[2], float v_min, float v_max, const char *format = "%.3f",
-                             ImGuiSliderFlags flags = ImGuiSliderFlags_None);
-    static bool SliderFloat3(const char *label, float v[3], float v_min, float v_max, const char *format = "%.3f",
-                             ImGuiSliderFlags flags = ImGuiSliderFlags_None);
-    static bool SliderFloat4(const char *label, float v[4], float v_min, float v_max, const char *format = "%.3f",
-                             ImGuiSliderFlags flags = ImGuiSliderFlags_None);
-
     // Text aligned to the center of the window
     static void TextCentered(const std::string &text);
 

@@ -287,53 +287,6 @@ bool ImGuiExtras::ListBox(const char *label, VecStr &allItems, int &selected)
     return rtn;
 }
 
-bool ImGuiExtras::SliderInt(const char *label, int *v, int v_min, int v_max, const char *format, ImGuiSliderFlags flags)
-{
-    return SliderScalar(label, ImGuiDataType_S32, v, &v_min, &v_max, format, flags);
-}
-
-bool ImGuiExtras::SliderInt2(const char *label, int v[2], int v_min, int v_max, const char *format,
-                             ImGuiSliderFlags flags)
-{
-    return SliderScalarN(label, ImGuiDataType_S32, v, 2, &v_min, &v_max, format, flags);
-}
-
-bool ImGuiExtras::SliderInt3(const char *label, int v[3], int v_min, int v_max, const char *format,
-                             ImGuiSliderFlags flags)
-{
-    return SliderScalarN(label, ImGuiDataType_S32, v, 3, &v_min, &v_max, format, flags);
-}
-
-bool ImGuiExtras::SliderInt4(const char *label, int v[4], int v_min, int v_max, const char *format,
-                             ImGuiSliderFlags flags)
-{
-    return SliderScalarN(label, ImGuiDataType_S32, v, 4, &v_min, &v_max, format, flags);
-}
-
-bool ImGuiExtras::SliderFloat(const char *label, float *v, float v_min, float v_max, const char *format,
-                              ImGuiSliderFlags flags)
-{
-    return SliderScalar(label, ImGuiDataType_Float, v, &v_min, &v_max, format, flags);
-}
-
-bool ImGuiExtras::SliderFloat2(const char *label, float v[2], float v_min, float v_max, const char *format,
-                               ImGuiSliderFlags flags)
-{
-    return SliderScalarN(label, ImGuiDataType_Float, v, 2, &v_min, &v_max, format, flags);
-}
-
-bool ImGuiExtras::SliderFloat3(const char *label, float v[3], float v_min, float v_max, const char *format,
-                               ImGuiSliderFlags flags)
-{
-    return SliderScalarN(label, ImGuiDataType_Float, v, 3, &v_min, &v_max, format, flags);
-}
-
-bool ImGuiExtras::SliderFloat4(const char *label, float v[4], float v_min, float v_max, const char *format,
-                               ImGuiSliderFlags flags)
-{
-    return SliderScalarN(label, ImGuiDataType_Float, v, 4, &v_min, &v_max, format, flags);
-}
-
 bool ImGuiExtras::Checkbox(const char *label, bool *v, const char *hint, bool is_disabled)
 {
     ImGuiWindow *window = ImGui::GetCurrentWindow();
