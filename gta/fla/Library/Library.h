@@ -8,18 +8,17 @@
 #include <dlfcn.h>
 #endif
 
-union tGenericLibraryModule
-{
+union tGenericLibraryModule {
 #ifdef IS_PLATFORM_WIN
-	HMODULE windows;
+    HMODULE windows;
 #elif defined(IS_PLATFORM_ANDROID)
-	void* linux_os;
+    void *linux_os;
 #endif
 };
 
 class Library
 {
-public:
-	// Returns symbol address
-	static void* GetSymbolAddress(const tGenericLibraryModule* pModule, const char* symbolName);
+  public:
+    // Returns symbol address
+    static void *GetSymbolAddress(const tGenericLibraryModule *pModule, const char *symbolName);
 };

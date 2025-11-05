@@ -1,32 +1,34 @@
 #include "hotkeys.h"
-#include "storage/configstorage.h"
+#include "imgui_internal.h"
 
 inline bool IsKeyDown(ImGuiKey key)
 {
     return key == ImGuiKey_None || ImGui::IsKeyDown(key);
 }
 
-Hotkey::Hotkey(const std::string &name, ConfigStorage *config, ImGuiKey key1, ImGuiKey key2)
+Hotkey::Hotkey(const std::string &name, TableRegistry<HotKeyCodes> *config, ImGuiKey key1, ImGuiKey key2)
 {
-    codes[0] = defaultCodes[0] = key1;
+    // default values
+    usedCombo.key1 = defCombo.key1 = key1;
+    usedCombo.key2 = defCombo.key2 = key2;
+
+    if (!config || !config->load())
+    {
+        return;
+    }
+
+    if (!config->getTable(name).empty())
+    {
+        usedCombo = config->getTable(name).front(); // Should be one entry anyway
+    }
 
     if (key2 == ImGuiKey_None)
     {
-        codes[1] = defaultCodes[1] = key1;
-    }
-    else
-    {
-        codes[1] = defaultCodes[1] = key2;
+        usedCombo.key2 = usedCombo.key1;
     }
 
-    path = "Hotkeys." + name;
     this->config = config;
-
-    if (config)
-    {
-        codes[0] = static_cast<ImGuiKey>(config->Get((path + ".Key1").c_str(), static_cast<int>(codes[0])));
-        codes[1] = static_cast<ImGuiKey>(config->Get((path + ".Key2").c_str(), static_cast<int>(codes[1])));
-    }
+    hotkeyName = name;
 }
 
 void Hotkey::Draw(const char *label)
@@ -42,22 +44,34 @@ void Hotkey::Draw(const char *label)
         ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_FrameBgActive]);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, style.Colors[ImGuiCol_FrameBgActive]);
 
-        int c = 0;
-        for (ImGuiKey k = ImGuiKey_Tab; k <= ImGuiKey_GamepadRStickDown;
-             (k = static_cast<ImGuiKey>(static_cast<int>(k) + 1)))
+        for (ImGuiKey key = ImGuiKey_Tab; key <= ImGuiKey_GamepadRStickDown;
+             key = static_cast<ImGuiKey>(static_cast<int>(key) + 1))
         {
-            if (IsKeyDown(k))
+            if (IsKeyDown(key))
             {
-                codes[c++] = k;
+                usedCombo.key1 = key;
                 pressed = true;
-                if (c >= 2)
-                    break;
+                break;
             }
         }
 
-        if (codes[1] == ImGuiKey_None)
+        if (usedCombo.key1 != ImGuiKey_None)
         {
-            codes[1] = codes[0];
+            for (ImGuiKey key = static_cast<ImGuiKey>(static_cast<int>(usedCombo.key1) + 1);
+                 key <= ImGuiKey_GamepadRStickDown; key = static_cast<ImGuiKey>(static_cast<int>(key) + 1))
+            {
+                if (IsKeyDown(key))
+                {
+                    usedCombo.key2 = key;
+                    pressed = true;
+                    break;
+                }
+            }
+        }
+
+        if (usedCombo.key2 == ImGuiKey_None)
+        {
+            usedCombo.key2 = usedCombo.key1;
         }
     }
 
@@ -73,15 +87,16 @@ void Hotkey::Draw(const char *label)
     // Show a tooltip for active state above the hotkey widget
     if (active)
     {
-        if (wasPressed && !IsKeyDown(codes[0]) && !IsKeyDown(codes[1]))
+        if (wasPressed && !IsKeyDown(usedCombo.key1) && !IsKeyDown(usedCombo.key2))
         {
             current = "";
             wasPressed = pressed = false;
 
             if (config)
             {
-                config->Set((path + ".Key1").c_str(), static_cast<int>(codes[0]));
-                config->Set((path + ".Key2").c_str(), static_cast<int>(codes[1]));
+                config->clearTable(hotkeyName);
+                config->updateByID(hotkeyName, usedCombo);
+                config->save();
             }
 
             lastUpdate = ImGui::GetTime();
@@ -95,8 +110,7 @@ void Hotkey::Draw(const char *label)
         ImGui::SetNextWindowPos(pos);
         if (!pressed && current == label)
         {
-            codes[0] = ImGuiKey_None;
-            codes[1] = ImGuiKey_None;
+            usedCombo = {ImGuiKey_None, ImGuiKey_None};
         }
         ImGui::SetTooltip(pressed ? "Release the keys to set as hotkey" : "Press a new key combination");
     }
@@ -110,10 +124,10 @@ void Hotkey::Draw(const char *label)
     if (ImGui::Button(std::format("Reset##{}", label).c_str(), ImVec2(resetButtonSize.x, height)))
     {
         current = "";
-        codes[0] = defaultCodes[0];
-        codes[1] = defaultCodes[1];
-        config->Set((path + ".Key1").c_str(), static_cast<int>(codes[0]));
-        config->Set((path + ".Key2").c_str(), static_cast<int>(codes[1]));
+        usedCombo = defCombo;
+        config->clearTable(hotkeyName);
+        config->updateByID(hotkeyName, usedCombo);
+        config->save();
     }
     ImGui::Dummy(ImVec2(0, 10));
 }
@@ -125,11 +139,11 @@ bool Hotkey::Pressed(bool noDelay)
 
     if (noDelay)
     {
-        return IsKeyDown(codes[0]) && IsKeyDown(codes[1]);
+        return IsKeyDown(usedCombo.key1) && IsKeyDown(usedCombo.key2);
     }
     else
     {
-        if (IsKeyDown(codes[0]) && IsKeyDown(codes[1]))
+        if (IsKeyDown(usedCombo.key1) && IsKeyDown(usedCombo.key2))
         {
             wPressed = true;
         }
@@ -147,12 +161,12 @@ bool Hotkey::Pressed(bool noDelay)
 
 std::string Hotkey::GetKeyCombo()
 {
-    if (codes[0] == codes[1])
+    if (usedCombo.key1 == usedCombo.key2)
     {
-        return ImGui::GetKeyName(codes[0]);
+        return ImGui::GetKeyName(usedCombo.key1);
     }
     else
     {
-        return std::format("{} + {}", ImGui::GetKeyName(codes[0]), ImGui::GetKeyName(codes[1]));
+        return std::format("{} + {}", ImGui::GetKeyName(usedCombo.key1), ImGui::GetKeyName(usedCombo.key2));
     }
 }

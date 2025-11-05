@@ -1,9 +1,9 @@
 #include <Urlmon.h>
 
 #include "ghtracker.h"
-#include <nlohmann/json.hpp>
 
 #include <fstream>
+#include <nlohmann/json.hpp>
 
 GHTracker::GHTracker(const std::string &userName, const std::string &repoName, const std::string &currentVer)
     : localVer(currentVer)

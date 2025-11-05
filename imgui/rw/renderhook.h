@@ -1,13 +1,14 @@
 #pragma once
 #include "pch.h"
+
 #include <functional>
 
-class RenderHook {
-private:
-
-    static inline WNDPROC          ogWndProc = nullptr;
-    static inline bool             bMouseVisible = false;
-    static inline bool             bInitialized = false;
+class RenderHook
+{
+  private:
+    static inline WNDPROC ogWndProc = nullptr;
+    static inline bool bMouseVisible = false;
+    static inline bool bInitialized = false;
     static inline std::function<void()> renderFn = nullptr;
 
     // Hooks
@@ -18,7 +19,7 @@ private:
     static void RenderImGui();
     static void ShutdownImGui();
 
-public:
+  public:
     static bool IsCursorVisible();
     static void SetCursorVisible(bool visible);
 

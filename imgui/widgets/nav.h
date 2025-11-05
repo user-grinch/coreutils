@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-using PagePtr = void *;
+using ViewPtr = void *;
 
 /*
     Navigation Class for Trainer
@@ -21,7 +21,7 @@ class ImGuiNav
     */
     struct TabInfo
     {
-        PagePtr m_pPage = nullptr;
+        ViewPtr m_pPage = nullptr;
         std::vector<std::string> m_TabNames;
         size_t m_nSelectedTab = 0;
     };
@@ -45,15 +45,15 @@ class ImGuiNav
     static bool BeginPage(const char *icon, const char *name, bool active);
 
     // Clears a page from store
-    static void ResetPage(PagePtr page);
+    static void ResetPage(ViewPtr page);
     static void ResetAll();
 
     // Inits a new page-tab & draws it
     static bool BeginTab(const char *name, bool active);
 
     // Returns the name of the currently selected tab
-    static std::string GetSelectedTab(PagePtr page);
+    static std::string GetSelectedTab(ViewPtr page);
 
     // Returns true when specified tab is selected
-    static bool IsTabSelected(PagePtr page, std::string &&tabName);
+    static bool IsTabSelected(ViewPtr page, std::string &&tabName);
 };

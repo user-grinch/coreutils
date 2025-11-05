@@ -1,24 +1,40 @@
 #pragma once
 #include <imgui.h>
-#include <imgui_internal.h>
+
+#include "db/dbmgr.hpp"
 
 #include <string>
 
-extern class ConfigStorage;
-class Hotkey {
-private:
-  static inline std::string current;
-  bool wPressed = false;
-  ConfigStorage *config;
-  ImGuiKey codes[2], defaultCodes[2];
-  std::string path;
-  double lastUpdate;
+struct HotKeyCodes
+{
+    ImGuiKey key1, key2;
 
-public:
-  Hotkey(const std::string& name, ConfigStorage *config = nullptr, ImGuiKey key1 = ImGuiKey_None, ImGuiKey key2 = ImGuiKey_None);
+    std::string toString()
+    {
+        return std::format("{}.{}", static_cast<int>(key1), static_cast<int>(key2));
+    }
+};
 
-  void Draw(const char* label);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(HotKeyCodes, key1, key2);
 
-  std::string GetKeyCombo();
-  bool Pressed(bool noDelay = false);
+class Hotkey
+{
+  private:
+    static inline std::string current;
+    std::string hotkeyName;
+
+    bool wPressed = false;
+    HotKeyCodes usedCombo, defCombo;
+    TableRegistry<HotKeyCodes> *config = nullptr;
+
+    double lastUpdate;
+
+  public:
+    Hotkey(const std::string &name, TableRegistry<HotKeyCodes> *config, ImGuiKey key1 = ImGuiKey_None,
+           ImGuiKey key2 = ImGuiKey_None);
+
+    void Draw(const char *label);
+
+    std::string GetKeyCombo();
+    bool Pressed(bool noDelay = false);
 };

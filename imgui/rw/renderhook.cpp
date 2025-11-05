@@ -90,9 +90,7 @@ void RenderHook::InitImGui()
     ImGuiIO &io = ImGui::GetIO();
     io.IniFilename = NULL;
     io.LogFilename = NULL;
-    //io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 20.0f);
-    ogWndProc = reinterpret_cast<WNDPROC>(
-        SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(WndProcHook)));
+    // io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 20.0f);
     plugin::patch::Nop(0x00531155, 5); // shift trigger fix
 }
 
@@ -173,6 +171,8 @@ void RenderHook::Init(std::function<void()> callback)
     plugin::Events::drawMenuBackgroundEvent += []() { RenderImGui(); };
 
     renderFn = std::move(callback);
+    ogWndProc = reinterpret_cast<WNDPROC>(
+        SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, reinterpret_cast<LONG_PTR>(WndProcHook)));
     bInitialized = true;
 }
 

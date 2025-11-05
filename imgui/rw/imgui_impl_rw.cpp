@@ -87,7 +87,7 @@ void ImGui_ImplRW_RenderDrawData(ImDrawData *draw_data)
     RECT oldScissor;
     d3ddev->GetScissorRect(&oldScissor);
     BOOL oldScissorEnable;
-    d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, (DWORD*) & oldScissorEnable);
+    d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, (DWORD *)&oldScissorEnable);
 
     int vtx_offset = 0;
     for (int n = 0; n < draw_data->CmdListsCount; n++)
@@ -195,7 +195,8 @@ void ImGui_ImplRW_NewFrame()
 
     ImGuiIO &io = ImGui::GetIO();
     io.DisplaySize = ImVec2((float)plugin::screen::GetScreenWidth(), (float)plugin::screen::GetScreenHeight());
-    io.DeltaTime = CTimer::ms_fTimeStepNonClipped;
+    io.DeltaTime = std::max(1 / 60.0f, CTimer::ms_fTimeStep / 1000.0f); // fallback to 60 FPS
+
     io.KeyCtrl = ImGui::IsKeyPressed(ImGuiKey_LeftCtrl) || ImGui::IsKeyPressed(ImGuiKey_RightCtrl);
     io.KeyShift = ImGui::IsKeyPressed(ImGuiKey_LeftShift) || ImGui::IsKeyPressed(ImGuiKey_RightShift);
     io.KeyAlt = ImGui::IsKeyPressed(ImGuiKey_LeftAlt) || ImGui::IsKeyPressed(ImGuiKey_RightAlt);
