@@ -524,5 +524,5 @@ void ImGuiExtras::TooltipInlined(const char *expandedText, const char *minimized
 
 float ImGuiExtras::GetWindowContentRegionWidth()
 {
-    return ImGui::GetContentRegionMax().x;
+    return ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 }
