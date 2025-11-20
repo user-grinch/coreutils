@@ -20,7 +20,7 @@ float FontMgr::GetScaleFactor(float w, float h)
 
     if (w == -1) w = static_cast<float>(rect.right - rect.left);
     if (h == -1) h = static_cast<float>(rect.bottom - rect.top);
-    return min(w / BASE_WIDTH * 0.65f, h / BASE_HEIGHT * 0.65f);
+    return min(w / BASE_WIDTH * 0.5f, h / BASE_HEIGHT * 0.5f);
 }
 
 const ImWchar *FontMgr::GetGlyphRangesInternal(bool isIcon)
