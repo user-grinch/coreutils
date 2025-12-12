@@ -66,6 +66,7 @@ void RenderHook::RenderImGui()
         ImGui::PopFont();
 
         io.MouseDrawCursor = bMouseVisible;
+        io.ConfigDebugHighlightIdConflicts = false;
 
         ImGui::EndFrame();
         ImGui::Render();

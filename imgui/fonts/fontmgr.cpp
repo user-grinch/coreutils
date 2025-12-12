@@ -1,5 +1,4 @@
 #include <windows.h>
-
 #include "fontmgr.h"
 
 #include <algorithm>
@@ -25,12 +24,21 @@ float FontMgr::GetScaleFactor(float w, float h)
 
 const ImWchar *FontMgr::GetGlyphRangesInternal(bool isIcon)
 {
-    static const ImWchar textRanges[] = {0x0020, 0x00FF, // Basic Latin + Latin Supplement
-                                         0x0980, 0x09FF, // Bengali
-                                         0x2000, 0x206F, // General Punctuation
-                                         0x0400, 0x052F, 0x2DE0, 0x2DFF, 0xA640, 0xA69F, // Cyrillic
-                                         0x011E, 0x011F, 0x015E, 0x015F, 0x0130, 0x0131, // Turkish
-                                         0};
+    static const ImWchar textRanges[] = {
+        0x0020, 0x00FF,       // Basic Latin + Latin-1 Supplement
+        0x0980, 0x09FF,       // Bengali
+        0x2000, 0x206F,       // General Punctuation
+        0x0400, 0x052F,       // Cyrillic
+        0x2DE0, 0x2DFF,       // Cyrillic Extended-A
+        0xA640, 0xA69F,       // Cyrillic Extended-B
+        0x011E, 0x011F,       // Turkish Ğ / ğ
+        0x015E, 0x015F,       // Turkish Ş / ş
+        0x0130, 0x0131,       // Turkish İ / ı
+        0x3400, 0x4DBF,       // CJK Unified Ideographs Extension A
+        0x4E00, 0x9FFF,       // CJK Unified Ideographs
+        0x20000, 0x2A6DF,     // CJK Unified Ideographs Extension B (optional, Traditional)
+        0                     // Null-terminator
+    };
 
     static const ImWchar iconRanges[] = {0xF0, 0xFB, 0};
 
